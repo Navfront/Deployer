@@ -1,0 +1,25 @@
+{
+  "name": "deployer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon build/index.js",
+    "watch": "tsc -w",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "4.18.2",
+    "nodemon": "2.0.20",
+    "socket.io": "4.5.3"
+  },
+  "devDependencies": {
+    "eslint": "8.26.0",
+    "prettier": "2.7.1",
+    "typescript": "4.8.4"
+  },
+  "type": "module"
+}
