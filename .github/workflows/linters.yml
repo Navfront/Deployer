@@ -1,8 +1,9 @@
 run-name: Deploy to ${{ inputs.deploy_target }} by @${{ github.actor }}
-on: push
-branches:
-  - main
-  - 'releases/**'
+on:
+  pull_request:
+    branches:
+      - main
+      - 'releases/**'
 jobs:
   syntax-test:
     runs-on: ubuntu-latest
