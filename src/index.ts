@@ -1,1 +1,5 @@
-console.log('123')
+import dotenv from 'dotenv'
+
+dotenv.config()
+
+console.log(process.env.PORT)
