@@ -1,5 +1,8 @@
 import dotenv from 'dotenv'
+import { Server } from './main.js'
 
 dotenv.config()
+const port = process.env.PORT ?? '1234'
 
-console.log(process.env.PORT)
+const server = new Server(port)
+server.run()
