@@ -1,8 +1,16 @@
 import dotenv from 'dotenv'
-import { Server } from './main.js'
+import { SocketServer } from './server.js'
 
 dotenv.config()
-const port = process.env.PORT ?? '1234'
 
-const server = new Server(port)
+const PORT = Number(process.env.PORT ?? '1234')
+
+const server = new SocketServer({ port: PORT })
+
+server.on('connect', () => {
+  console.log('connected!')
+})
+server.on('disconnect', () => {
+  console.log('disconnected!')
+})
 server.run()
