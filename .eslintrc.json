@@ -11,12 +11,7 @@
     "project": "tsconfig.json",
     "tsconfigRootDir": "."
   },
-  "rules": {
-    "space-before-function-paren": [
-      "error",
-      "never"
-    ]
-  },
+  "rules": {},
   "ignorePatterns": [
     "build/**/*.js"
   ]
