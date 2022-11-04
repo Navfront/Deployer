@@ -16,6 +16,7 @@ export class SocketServer {
 
   constructor (options: Options) {
     this.expressApp = express().use(cors())
+    this.expressApp.use(express.static('./public'))
     this.httpServer = createServer(this.expressApp)
     this.io = new Server(this.httpServer)
     this.port = String(options.port)
