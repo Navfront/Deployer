@@ -3,7 +3,7 @@ import express, { Application } from 'express'
 import http, { createServer } from 'http'
 import { Server } from 'socket.io'
 
-type OnCallback = (...args: any[]) => void
+type OnCallback = (...args: any[]) => Promise<void>
 interface Options {
   port: number
 }
