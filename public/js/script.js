@@ -3,6 +3,12 @@ import { Logger } from "./logger.js";
 const logger = new Logger(root);
 
 const socket = io();
-socket.on("hello", () => {
-  logger.log(Date());
+socket.on("hello", (data) => {
+  const date = new Date();
+  console.log(data);
+  logger.log(
+    `${date.toLocaleDateString()} ${date.toLocaleTimeString()} - ${
+      "message" + data
+    }`
+  );
 });
