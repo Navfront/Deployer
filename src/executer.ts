@@ -1,6 +1,6 @@
 import { exec } from 'child_process'
 
-export const ex = async (command: string): Promise<String> => {
+export const ex = async (command: string): Promise<string> => {
   const result = new Promise<string>((resolve, reject) => {
     exec(command, (err, message) => {
       if (err != null) {

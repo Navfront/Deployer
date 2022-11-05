@@ -7,7 +7,7 @@ export class Logger {
   }
 
   log(text) {
-    const messageParagraph = document.createElement("p");
+    const messageParagraph = document.createElement("pre");
     messageParagraph.classList.add("message");
     messageParagraph.textContent = String(text);
     if (this.list.childNodes.length > 5) {
