@@ -15,7 +15,7 @@ interface GetContainers {
 }
 
 export class Mem {
-  private readonly containers: Containers[] = []
+  private containers: Containers[] = []
 
   private parseContainers (str: string): any[] {
     const result = str.split(/\n/).slice(1).filter(it => it !== '')
@@ -32,10 +32,10 @@ export class Mem {
 
   async getContainers (): Promise<GetContainers> {
     const raw = await ex('docker ps -a')
-
+    this.containers = this.parseContainers(raw)
     return {
       raw,
-      containers: this.parseContainers(raw)
+      containers: this.containers
     }
   }
 }
