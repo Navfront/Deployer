@@ -1,7 +1,7 @@
 
 import { Job, Mem } from './mem.js'
 import { SocketServer } from './server.js'
-import { ex } from './executer.js'
+// import { ex } from './executer.js'
 import { Socket } from 'socket.io'
 
 interface DeployerOptions {

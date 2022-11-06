@@ -7,4 +7,4 @@ const PORT = Number(process.env.PORT ?? '1234')
 
 const dp = new Deployer({ port: PORT })
 
-dp.run()
+void dp.run()
