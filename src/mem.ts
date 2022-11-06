@@ -9,6 +9,13 @@ interface Containers {
   created: string
 }
 
+interface Job {
+  'commit': string | null
+  'kill': string[]
+  'delete': string[]
+  'use': string[]
+}
+
 interface GetContainers {
   raw: string
   containers: Containers[]
@@ -16,6 +23,7 @@ interface GetContainers {
 
 export class Mem {
   private containers: Containers[] = []
+  private readonly jobStack: Job[] = []
 
   private parseContainers (str: string): any[] {
     const result = str.split(/\n/).slice(1).filter(it => it !== '')
@@ -37,5 +45,19 @@ export class Mem {
       raw,
       containers: this.containers
     }
+  }
+
+  pushJob (job: Job): void {
+    console.log('Pushing job..', job)
+    this.jobs.push(job)
+  }
+
+  get jobs (): Job[] {
+    return this.jobStack
+  }
+
+  clearJobs (): void {
+    console.log('Clear all jobs..')
+    this.jobStack.length = 0
   }
 }

@@ -9,6 +9,10 @@ const PORT = Number(process.env.PORT ?? '1234')
 const server = new SocketServer({ port: PORT })
 const mem = new Mem()
 
+server.onPath('/dploy', 'post', (req, res) => {
+  mem.pushJob(req.body)
+  console.log(mem.jobs.length)
+})
 server.on('connect', async (socket) => {
   console.log('connected!')
 

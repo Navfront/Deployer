@@ -1,5 +1,6 @@
+import bodyParser from 'body-parser'
 import cors from 'cors'
-import express, { Application } from 'express'
+import express, { Application, RequestHandler } from 'express'
 import http, { createServer } from 'http'
 import { Server } from 'socket.io'
 
@@ -8,6 +9,8 @@ interface Options {
   port: number
 }
 
+type ExpressCallBack = RequestHandler
+
 export class SocketServer {
   private readonly expressApp: Application
   private readonly httpServer: http.Server
@@ -15,7 +18,7 @@ export class SocketServer {
   private readonly port: string
 
   constructor (options: Options) {
-    this.expressApp = express().use(cors())
+    this.expressApp = express().use(cors()).use(express.json()).use(bodyParser.urlencoded({ extended: true }))
     this.expressApp.use(express.static('./public'))
     this.httpServer = createServer(this.expressApp)
     this.io = new Server(this.httpServer)
@@ -30,5 +33,16 @@ export class SocketServer {
 
   on (type: string, callback: OnCallback): void {
     this.io.on(type, callback)
+  }
+
+  onPath (path: string, type: 'get' | 'post' = 'get', callback: ExpressCallBack): void {
+    switch (type) {
+      case 'post':
+        this.expressApp.post(path, callback)
+        break
+      default:
+        this.expressApp.get(path, callback)
+        break
+    }
   }
 }
