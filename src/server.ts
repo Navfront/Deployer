@@ -35,7 +35,7 @@ export class SocketServer {
     this.io.on(type, callback)
   }
 
-  onPath (path: string, type: 'get' | 'post' = 'get', callback: ExpressCallBack): void {
+  async onPath (path: string, type: 'get' | 'post' = 'get', callback: ExpressCallBack): Promise<void> {
     switch (type) {
       case 'post':
         this.expressApp.post(path, callback)

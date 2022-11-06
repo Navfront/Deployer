@@ -1,6 +1,6 @@
 import { ex } from './executer.js'
 
-interface Containers {
+interface Container {
   id: string
   image: string
   isOnline: boolean
@@ -9,7 +9,7 @@ interface Containers {
   created: string
 }
 
-interface Job {
+export interface Job {
   'commit': string | null
   'kill': string[]
   'delete': string[]
@@ -18,11 +18,11 @@ interface Job {
 
 interface GetContainers {
   raw: string
-  containers: Containers[]
+  containers: Container[]
 }
 
 export class Mem {
-  private containers: Containers[] = []
+  private containers: Container[] = []
   private readonly jobStack: Job[] = []
 
   private parseContainers (str: string): any[] {
