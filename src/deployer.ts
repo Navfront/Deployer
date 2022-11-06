@@ -27,10 +27,10 @@ export class Deployer {
 
   async run (): Promise<void> {
     // Deploy hand logic
-    await this.server.onPath('/dploy', 'post', (req, res) => {
+    void this.server.onPath('/dploy', 'post', (req, res) => {
       const job = req.body as Job
       this.mem.pushJob(job)
-      void this.emitAll('message', `${String(new Date().toISOString())} JOB: Commit: ${job.commit ?? 'undefined'} Deploy: ${job.use.join(' | ')}`).then().catch()
+      void this.emitAll('message', `${String(new Date().toISOString())} JOB: Commit: ${job.commit ?? 'undefined'} Deploy: ${job.use.join(' | ')}`)
 
       res.status(203).send('ok')
     })
