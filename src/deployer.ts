@@ -1,12 +1,14 @@
-
+import { ex } from './executer.js'
 import { Job, Mem } from './mem.js'
 import { SocketServer } from './server.js'
-// import { ex } from './executer.js'
 import { Socket } from 'socket.io'
-import { ex } from './executer.js'
 
 interface DeployerOptions {
   port: number
+}
+
+enum MsgTypes {
+  message = 'message'
 }
 
 export class Deployer {
@@ -34,9 +36,11 @@ export class Deployer {
       // memorize job to mem-stack
       this.mem.pushJob(job)
 
-      await this.emitAll('message', `${String(new Date().toISOString())} JOB: Commit: ${job.commit ?? 'undefined'} Deploy: ${job.use.join(' | ')}`)
+      await this.emitAll(MsgTypes.message, `${String(new Date().toISOString())} JOB: Commit: ${job.commit ?? 'undefined'} Deploy: ${job.use.join(' | ')}`)
 
-      await this.emitAll('message', `Runing on ${await ex('docker -v')}`)
+      await this.emitAll(MsgTypes.message, `Runing on ${await ex('docker -v')}`)
+
+      await this.emitAll(MsgTypes.message, '')
 
       res.status(203).send('ok')
     })
