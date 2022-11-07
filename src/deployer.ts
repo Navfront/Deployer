@@ -3,6 +3,7 @@ import { Job, Mem } from './mem.js'
 import { SocketServer } from './server.js'
 // import { ex } from './executer.js'
 import { Socket } from 'socket.io'
+import { ex } from './executer.js'
 
 interface DeployerOptions {
   port: number
@@ -27,10 +28,15 @@ export class Deployer {
 
   async run (): Promise<void> {
     // Deploy hand logic
-    void this.server.onPath('/dploy', 'post', (req, res) => {
+    void this.server.onPath('/dploy', 'post', async (req, res) => {
       const job = req.body as Job
+
+      // memorize job to mem-stack
       this.mem.pushJob(job)
-      void this.emitAll('message', `${String(new Date().toISOString())} JOB: Commit: ${job.commit ?? 'undefined'} Deploy: ${job.use.join(' | ')}`)
+
+      await this.emitAll('message', `${String(new Date().toISOString())} JOB: Commit: ${job.commit ?? 'undefined'} Deploy: ${job.use.join(' | ')}`)
+
+      await this.emitAll('message', `Runing on ${await ex('docker -v')}`)
 
       res.status(203).send('ok')
     })
