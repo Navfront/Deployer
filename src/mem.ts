@@ -1,14 +1,3 @@
-import { ex } from './executer.js'
-
-interface Container {
-  id: string
-  image: string
-  isOnline: boolean
-  names: string
-  ports: string
-  created: string
-}
-
 export interface Job {
   'commit': string | null
   'kill': string[]
@@ -16,50 +5,45 @@ export interface Job {
   'use': string[]
 }
 
-interface GetContainers {
-  raw: string
-  containers: Container[]
-}
+export type SubscribeCallBack = (() => void) | null
 
 export class Mem {
-  private containers: Container[] = []
-  private readonly jobStack: Job[] = []
+  private readonly jobQueue: Job[] = []
+  private cb: SubscribeCallBack
 
-  private parseContainers (str: string): Container[] {
-    const result = str.split(/\n/).slice(1).filter(it => it !== '')
-    return result.map(rawContainer => {
-      const splitted = rawContainer.split(/\s{3,}/)
-      return {
-        id: splitted[0],
-        image: splitted[1],
-        isOnline: !/Exited/gi.test(splitted[4]),
-        ports: splitted[5],
-        names: '',
-        created: ''
-      }
-    })
+  constructor () {
+    this.cb = null
   }
 
-  async getContainers (): Promise<GetContainers> {
-    const raw = await ex('docker ps -a')
-    this.containers = this.parseContainers(raw)
-    return {
-      raw,
-      containers: this.containers
-    }
+  subscribePushes (cb: SubscribeCallBack): void {
+    this.cb = cb
   }
 
   pushJob (job: Job): void {
     console.log('Pushing job..', job)
     this.jobs.push(job)
+    if (this.cb != null) {
+      this.cb()
+    }
+  }
+
+  shiftJob (): Job | null {
+    if (this.jobQueue.length > 0) {
+      return this.jobQueue.shift() as Job
+    }
+    return null
+  }
+
+  get length (): number {
+    return this.jobs.length
   }
 
   get jobs (): Job[] {
-    return this.jobStack
+    return this.jobQueue
   }
 
   clearJobs (): void {
     console.log('Clear all jobs..')
-    this.jobStack.length = 0
+    this.jobQueue.length = 0
   }
 }
