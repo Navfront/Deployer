@@ -8,9 +8,11 @@ interface DeployerOptions {
   port: number
 }
 
-enum MsgTypes {
+export enum MsgTypes {
   message = 'message'
 }
+
+export type EmitAll = (type: string, data: Promise<string> | string | undefined) => Promise<void>
 
 export class Deployer {
   private readonly server: SocketServer
@@ -21,7 +23,7 @@ export class Deployer {
   constructor (options: DeployerOptions) {
     this.server = new SocketServer({ port: options.port })
     this.mem = new Mem()
-    this.service = new Service(this.mem)
+    this.service = new Service(this.mem, this.emitAll.bind(this))
     this.connections = new Set()
   }
 
@@ -37,7 +39,7 @@ export class Deployer {
       const job = req.body as Job
 
       // Push job to mem-queue
-      this.mem.pushJob(job)
+      await this.mem.pushJob(job)
 
       await this.emitAll(MsgTypes.message, `${String(new Date().toISOString())} JOB: Commit: ${job.commit ?? 'undefined'} Deploy: ${job.use.join(' | ')}`)
 

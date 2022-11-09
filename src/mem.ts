@@ -5,7 +5,7 @@ export interface Job {
   'use': string[]
 }
 
-export type SubscribeCallBack = (() => void) | null
+export type SubscribeCallBack = (() => Promise<void>) | null
 
 export class Mem {
   private readonly jobQueue: Job[] = []
@@ -19,11 +19,11 @@ export class Mem {
     this.cb = cb
   }
 
-  pushJob (job: Job): void {
+  async pushJob (job: Job): Promise<void> {
     console.log('Pushing job..', job)
     this.jobs.push(job)
     if (this.cb != null) {
-      this.cb()
+      await this.cb()
     }
   }
 

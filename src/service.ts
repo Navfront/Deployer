@@ -1,6 +1,7 @@
 
 import { Mem } from './mem.js'
 import { ex } from './executer.js'
+import { EmitAll, MsgTypes } from './deployer.js'
 
 interface Container {
   id: string
@@ -19,10 +20,12 @@ interface GetContainers {
 export class Service {
   private containers: Container[] = []
   private readonly mem: Mem
+  emitAll: EmitAll
 
-  constructor (mem: Mem) {
+  constructor (mem: Mem, emitAll: EmitAll) {
     this.mem = mem
     this.mem.subscribePushes(this.work)
+    this.emitAll = emitAll
   }
 
   private parseContainers (str: string): Container[] {
@@ -49,13 +52,12 @@ export class Service {
     }
   }
 
-  private work (): void {
+  private async work (): Promise<void> {
     let job
     do {
       job = this.mem.shiftJob()
       console.log('doing job', job, 'left: ', this.mem.length)
-
-      // await this.emitAll(MsgTypes.message, `Runing on ${await ex('docker -v')}`)
+      await this.emitAll(MsgTypes.message, `Runing on ${await ex('docker -v')}`)
 
       // // get current containers
       // const current = await this.mem.getContainers()
