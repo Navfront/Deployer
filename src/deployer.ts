@@ -29,7 +29,8 @@ export class Deployer {
 
   private async emitAll (type: string, data: Promise<string> | string | undefined): Promise<void> {
     for (const socket of this.connections) {
-      socket.emit(type, await data)
+      const message = await data
+      socket.emit(type, message)
     }
   }
 
@@ -37,11 +38,9 @@ export class Deployer {
     // Deploy hand logic
     void this.server.onPath('/dploy', 'post', async (req, res) => {
       const job = req.body as Job
-
+      await this.emitAll(MsgTypes.message, `${String(new Date().toISOString())} JOB: Commit: ${job.commit ?? 'undefined'} Deploy: ${job.use.join(' | ')}`)
       // Push job to mem-queue
       await this.mem.pushJob(job)
-
-      await this.emitAll(MsgTypes.message, `${String(new Date().toISOString())} JOB: Commit: ${job.commit ?? 'undefined'} Deploy: ${job.use.join(' | ')}`)
 
       res.status(203).send('Job pushed')
     })
