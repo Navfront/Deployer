@@ -1,8 +1,8 @@
 export interface Job {
   'commit': string | null
-  'kill': string[]
-  'delete': string[]
-  'use': string[]
+  'stops': string[]
+  'deletes': string[]
+  'runs': string[]
 }
 
 export type SubscribeCallBack = (() => Promise<void>) | null

@@ -41,5 +41,5 @@ export async function dockerRun (command: string): Promise<ExecutorReturn> {
   if (/\w{64}/i.test(id)) {
     return { message: `New container id: ${id}` }
   }
-  return { error: 'Failed parse id!' }
+  return { error: 'Failed to run!' }
 }

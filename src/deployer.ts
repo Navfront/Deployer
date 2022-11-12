@@ -2,7 +2,7 @@
 import { Job, Mem } from './mem.js'
 import { SocketServer } from './server.js'
 import { Socket } from 'socket.io'
-import { Service } from './service.js'
+import { Service } from './service/service.js'
 
 interface DeployerOptions {
   port: number
@@ -38,7 +38,7 @@ export class Deployer {
     // Deploy hand logic
     void this.server.onPath('/dploy', 'post', async (req, res) => {
       const job = req.body as Job
-      await this.emitAll(MsgTypes.message, `${String(new Date().toISOString())} JOB: Commit: ${job.commit ?? 'undefined'} Deploy: ${job.use.join(' | ')}`)
+      await this.emitAll(MsgTypes.message, `${String(new Date().toISOString())} JOB: Commit: ${job.commit ?? 'undefined'} Deploy: ${job.runs.join(' | ')}`)
       // Push job to mem-queue
       await this.mem.pushJob(job)
 

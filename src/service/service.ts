@@ -1,8 +1,8 @@
 
-import { Mem } from './mem.js'
-import { ex } from './executer.js'
-import { EmitAll, MsgTypes } from './deployer.js'
-import { dockerRun, getDockerVersion, rmDockerContainer, stopDockerContainer } from './utils.js'
+import { Mem } from '../mem.js'
+import { ex } from '../executer.js'
+import { EmitAll, MsgTypes } from '../deployer.js'
+import { dockerRun, getDockerVersion, rmDockerContainer, stopDockerContainer } from '../utils.js'
 
 interface Container {
   id: string
@@ -81,35 +81,38 @@ export class Service {
       }
 
       console.log('curr', current.containers)
-      // KILLING CONTAINERS
-      for (const containerName of job.kill) {
+      // DOCKER STOP CONTAINERS FROM JOB
+      for (const containerName of job.stops) {
         const condidate = this.containers.find(c => c.image === containerName)
         if (condidate != null) {
           if (condidate.isOnline) {
-            // DOCKER STOP..
             const stopped = await stopDockerContainer(condidate.id)
             if (stopped.message != null) (await this.emitAll(MsgTypes.message, stopped.message))
             else {
               await this.emitAll(MsgTypes.message, stopped.error)
             }
           }
-          // DOCKER RM..
-          const removed = await rmDockerContainer(condidate.id)
-          if (removed.error != null) {
-            await this.emitAll(MsgTypes.message, removed.error)
-          } else {
-            await this.emitAll(MsgTypes.message, removed.message)
-          }
         }
       }
-      // DOCKER RUN..
-      const id = await dockerRun(`docker run -d -p 80:80 ${job.use[0]}`)
-      if (id.error != null) {
-        await this.emitAll(MsgTypes.message, id.error)
-      } else {
-        await this.emitAll(MsgTypes.message, id.message)
+
+      // DOCKER DELETE CONTAINERS FROM JOB
+      for (const conteinerName of job.deletes) {
+        const condidate = this.containers.find(c => c.image === conteinerName)
+        if (condidate != null) {
+          const removed = await rmDockerContainer(condidate.id)
+          if (removed.message != null) {
+            await this.emitAll(MsgTypes.message, removed.message)
+          } else await this.emitAll(MsgTypes.message, removed.error)
+        }
       }
 
+      // DOCKER RUN..
+      for (const containerName of job.runs) {
+        const res = await dockerRun(`docker run -d -p 80:80 ${containerName}`)
+        if (res.message !== null) {
+          await this.emitAll(MsgTypes.message, res.message)
+        } else await this.emitAll(MsgTypes.message, res.error)
+      }
       job = this.mem.shiftJob()
     }
   }
