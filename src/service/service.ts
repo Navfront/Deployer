@@ -121,6 +121,7 @@ export class Service {
         this.dComposeService.writeDCSchemaToYML(job.runs)
         void dockerRun('docker-compose up', async (data) => {
           await this.emitAll(MsgTypes.message, data)
+          await this.emitAll(MsgTypes.message, 'Job completed!')
         },
         async (error) => {
           await this.emitAll(MsgTypes.message, error)
