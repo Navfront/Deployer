@@ -1,4 +1,4 @@
-import { ex } from './executer.js'
+import { ex, exNewTerm } from './executer.js'
 
 interface ExecutorReturn {
   error?: string
@@ -36,10 +36,6 @@ export async function rmDockerContainer (id: string): Promise<ExecutorReturn> {
   return { error: result }
 }
 
-export async function dockerRun (command: string): Promise<ExecutorReturn> {
-  const id = await ex(command)
-  if (/\w{64}/i.test(id)) {
-    return { message: `New container id: ${id.slice(0, 12)}` }
-  }
-  return { error: 'Failed to run!' }
+export async function dockerRun (command: string, messageCB: (data: any) => Promise<void>, errCB: (err: any) => Promise<void>): Promise<void> {
+  exNewTerm(command, messageCB, errCB)
 }

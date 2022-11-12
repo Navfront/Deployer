@@ -38,7 +38,7 @@ export class Deployer {
     // Deploy hand logic
     void this.server.onPath('/dploy', 'post', async (req, res) => {
       const job = req.body as Job
-      await this.emitAll(MsgTypes.message, `${String(new Date().toISOString())} JOB: Commit: ${job.commit ?? 'undefined'} Deploy: ${job.runs.join(' | ')}`)
+      await this.emitAll(MsgTypes.message, `${String(new Date().toISOString())} JOB: Commit: ${job.commit ?? 'undefined'} Deploy: ${Object.keys(job.runs.services).join(' ')}`)
       // Push job to mem-queue
       await this.mem.pushJob(job)
 

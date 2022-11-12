@@ -1,8 +1,9 @@
 
 import { Mem } from '../mem.js'
-import { ex } from '../executer.js'
+import { ex } from './executer.js'
 import { EmitAll, MsgTypes } from '../deployer.js'
-import { dockerRun, getDockerVersion, rmDockerContainer, stopDockerContainer } from '../utils.js'
+import { dockerRun, getDockerVersion, rmDockerContainer, stopDockerContainer } from './utils.js'
+import { DCompose } from './dcompose.js'
 
 interface Container {
   id: string
@@ -22,9 +23,11 @@ interface GetContainers {
 export class Service {
   private containers: Container[] = []
   private readonly mem: Mem
+  private readonly dComposeService: DCompose
   emitAll: EmitAll
 
   constructor (mem: Mem, emitAll: EmitAll) {
+    this.dComposeService = new DCompose()
     this.mem = mem
     this.mem.subscribePushes(this.work.bind(this))
     this.emitAll = emitAll
@@ -98,8 +101,12 @@ export class Service {
       // DOCKER DELETE CONTAINERS FROM JOB
       for (const conteinerName of job.deletes) {
         const filtredContainers = this.containers.filter(c => c.image === conteinerName)
+        console.log('del condidates:', filtredContainers)
+
         for (const condidate of filtredContainers) {
           if (condidate.isOnline) {
+            console.log('stopping', condidate)
+
             await stopDockerContainer(condidate.id)
           }
           const removed = await rmDockerContainer(condidate.id)
@@ -110,12 +117,21 @@ export class Service {
       }
 
       // DOCKER RUN..
-      for (const containerName of job.runs) {
-        const res = await dockerRun(`docker run -d -p 80:80 ${containerName}`)
-        if (res.message !== null) {
-          await this.emitAll(MsgTypes.message, res.message?.concat(` Image: ${containerName}`))
-        } else await this.emitAll(MsgTypes.message, res.error)
-      }
+      this.dComposeService.writeDCSchemaToYML(job.runs)
+      void dockerRun('docker-compose up', async (data) => {
+        await this.emitAll(MsgTypes.message, data)
+      },
+      async (error) => {
+        await this.emitAll(MsgTypes.message, error)
+      })
+
+      // for (const containerName of job.runs) {
+      // const res = await dockerRun(`docker run -d -p 80:80 ${containerName}`)
+
+      //   if (res.message !== null) {
+      //     await this.emitAll(MsgTypes.message, res.message?.concat(` Image: ${containerName}`))
+      //   } else await this.emitAll(MsgTypes.message, res.error)
+      // }
       job = this.mem.shiftJob()
     }
   }
