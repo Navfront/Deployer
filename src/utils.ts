@@ -39,7 +39,7 @@ export async function rmDockerContainer (id: string): Promise<ExecutorReturn> {
 export async function dockerRun (command: string): Promise<ExecutorReturn> {
   const id = await ex(command)
   if (/\w{64}/i.test(id)) {
-    return { message: `New container id: ${id}` }
+    return { message: `New container id: ${id.slice(0, 12)}` }
   }
   return { error: 'Failed to run!' }
 }

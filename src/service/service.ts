@@ -97,8 +97,11 @@ export class Service {
 
       // DOCKER DELETE CONTAINERS FROM JOB
       for (const conteinerName of job.deletes) {
-        const condidate = this.containers.find(c => c.image === conteinerName)
-        if (condidate != null) {
+        const filtredContainers = this.containers.filter(c => c.image === conteinerName)
+        for (const condidate of filtredContainers) {
+          if (condidate.isOnline) {
+            await stopDockerContainer(condidate.id)
+          }
           const removed = await rmDockerContainer(condidate.id)
           if (removed.message != null) {
             await this.emitAll(MsgTypes.message, removed.message)
@@ -110,7 +113,7 @@ export class Service {
       for (const containerName of job.runs) {
         const res = await dockerRun(`docker run -d -p 80:80 ${containerName}`)
         if (res.message !== null) {
-          await this.emitAll(MsgTypes.message, res.message)
+          await this.emitAll(MsgTypes.message, res.message?.concat(` Image: ${containerName}`))
         } else await this.emitAll(MsgTypes.message, res.error)
       }
       job = this.mem.shiftJob()
