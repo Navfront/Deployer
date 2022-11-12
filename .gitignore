@@ -13,3 +13,4 @@ node_modules/
 
 # Собранные файлы (допишите самостоятельно)
 build/
+docker-compose.yml

@@ -20,7 +20,8 @@ export const exNewTerm = (command: string, mesCb: any, errCb: any): void => {
     const spawned = spawn(cmd[0], [...cmd.slice(1)])
     spawned.stdout.setEncoding('utf8')
     spawned.stdout.on('data', mesCb)
-    spawned.stdout.on('error', errCb)
+    spawned.stderr.setEncoding('utf8')
+    spawned.stderr.on('data', errCb)
     setTimeout(() => {
       spawned.kill(); console.log('Close spawn process', spawned.pid)
     }, 30000)

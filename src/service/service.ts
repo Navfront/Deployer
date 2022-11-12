@@ -117,21 +117,15 @@ export class Service {
       }
 
       // DOCKER RUN..
-      this.dComposeService.writeDCSchemaToYML(job.runs)
-      void dockerRun('docker-compose up', async (data) => {
-        await this.emitAll(MsgTypes.message, data)
-      },
-      async (error) => {
-        await this.emitAll(MsgTypes.message, error)
-      })
-
-      // for (const containerName of job.runs) {
-      // const res = await dockerRun(`docker run -d -p 80:80 ${containerName}`)
-
-      //   if (res.message !== null) {
-      //     await this.emitAll(MsgTypes.message, res.message?.concat(` Image: ${containerName}`))
-      //   } else await this.emitAll(MsgTypes.message, res.error)
-      // }
+      if (Object.hasOwn(job.runs, 'version')) {
+        this.dComposeService.writeDCSchemaToYML(job.runs)
+        void dockerRun('docker-compose up', async (data) => {
+          await this.emitAll(MsgTypes.message, data)
+        },
+        async (error) => {
+          await this.emitAll(MsgTypes.message, error)
+        })
+      }
       job = this.mem.shiftJob()
     }
   }
