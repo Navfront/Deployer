@@ -1,8 +1,8 @@
 # Файлы и папки операционной системы
 .DS_Store
 Thumbs.db
-docker-compose*
-docker-compose.yml
+!docker-compose.yml
+*.yml
 
 
 # Файлы редактора
