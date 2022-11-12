@@ -1,0 +1,21 @@
+:root {
+  --theme-color-dark: #333333;
+  --theme-color-light: whitesmoke;
+}
+
+.page-theme-dark {
+  background-color:  var(--theme-color-dark);
+  color:  var(--theme-color-light);
+}
+
+.theme-switcher {
+  margin-left: auto;
+  width: 200px;
+}
+
+.theme-switcher label,
+.theme-switcher input {
+  cursor: pointer;
+}
+
+

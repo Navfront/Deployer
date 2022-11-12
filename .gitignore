@@ -1,6 +1,9 @@
 # Файлы и папки операционной системы
 .DS_Store
 Thumbs.db
+!docker-compose.yml
+*.yml
+
 
 # Файлы редактора
 .idea
@@ -12,4 +15,6 @@ Thumbs.db
 node_modules/
 
 # Собранные файлы (допишите самостоятельно)
+
 build/
+

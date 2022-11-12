@@ -1,6 +1,6 @@
 import bodyParser from 'body-parser'
 import cors from 'cors'
-import express, { Application, RequestHandler } from 'express'
+import express, { Application, Request, RequestHandler, Response } from 'express'
 import http, { createServer } from 'http'
 import { Server } from 'socket.io'
 
@@ -9,7 +9,9 @@ interface Options {
   port: number
 }
 
-type ExpressCallBack = RequestHandler
+interface ExpressCallBack extends RequestHandler {
+  (req: Request, res: Response): Promise<void>
+}
 
 export class SocketServer {
   private readonly expressApp: Application
@@ -38,10 +40,10 @@ export class SocketServer {
   async onPath (path: string, type: 'get' | 'post' = 'get', callback: ExpressCallBack): Promise<void> {
     switch (type) {
       case 'post':
-        this.expressApp.post(path, callback)
+        this.expressApp.post(path, callback as unknown as RequestHandler)
         break
       default:
-        this.expressApp.get(path, callback)
+        this.expressApp.get(path, callback as unknown as RequestHandler)
         break
     }
   }

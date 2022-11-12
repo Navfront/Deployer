@@ -5,10 +5,18 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="preload" href="js/socket.io.min.js" as="script" />
+    <link rel="stylesheet" href="css/style.css" />
     <title>Deployer</title>
   </head>
   <body>
+    <header class="header">
+      <div class="theme-switcher">
+        <label for="theme-switcher-input">Switch to Dark theme</label>
+        <input type="checkbox" name="themeswitcher" id="theme-switcher-input" />
+      </div>
+    </header>
     <h1>Deployer logs:</h1>
+
     <div id="root"></div>
     <script src="js/socket.io.min.js"></script>
     <script type="module" src="js/script.js"></script>
