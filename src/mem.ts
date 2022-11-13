@@ -1,9 +1,6 @@
 import { DComposeNode } from './service/dcompose'
 
 export interface Job {
-  'commit': string | null
-  'stops': string[]
-  'deletes': string[]
   'runs': DComposeNode
 }
 

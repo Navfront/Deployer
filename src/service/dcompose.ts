@@ -6,14 +6,13 @@ interface DComposeEnvironment {
 }
 
 interface DComposeService {
-  [serviceName: string]: {
-    image: string
-    portIn: number
-    portOut: number
-    restart: string
-    environment?: DComposeEnvironment
-    depends_on?: string
-  }
+  name: string
+  image: string
+  portIn: number
+  portOut: number
+  restart: string
+  environment?: DComposeEnvironment
+  depends_on?: string
 }
 
 export interface DComposeNode {
@@ -32,9 +31,8 @@ export class DCompose {
     file.write(`version: "${dComposeNode.version}"
 services:
   `)
-    for (const service of dComposeNode.services) {
-      const s = service[Object.getOwnPropertyNames(service)[0]]
-      file.write(`${Object.getOwnPropertyNames(service)[0]}:
+    for (const s of dComposeNode.services) {
+      file.write(`${s.name}:
     image: "${s.image}"
     ports:
       - "${s.portOut}:${s.portIn}"

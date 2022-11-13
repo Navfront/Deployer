@@ -85,8 +85,9 @@ export class Service {
 
       console.log('curr', current.containers)
       // DOCKER STOP CONTAINERS FROM JOB
-      for (const containerName of job.stops) {
-        const condidate = this.containers.find(c => c.image === containerName)
+      for (const container of job.runs.services) {
+        const searchTemplate = container.name.replace(/:v\d\.\d\.\d/, '')
+        const condidate = this.containers.find(c => new RegExp(searchTemplate).test(c.image))
         if (condidate != null) {
           if (condidate.isOnline) {
             const stopped = await stopDockerContainer(condidate.id)
@@ -95,20 +96,8 @@ export class Service {
               await this.emitAll(MsgTypes.message, stopped.error)
             }
           }
-        }
-      }
 
-      // DOCKER DELETE CONTAINERS FROM JOB
-      for (const conteinerName of job.deletes) {
-        const filtredContainers = this.containers.filter(c => c.image === conteinerName)
-        console.log('del condidates:', filtredContainers)
-
-        for (const condidate of filtredContainers) {
-          if (condidate.isOnline) {
-            console.log('stopping', condidate)
-
-            await stopDockerContainer(condidate.id)
-          }
+          // DOCKER DELETE CONTAINERS FROM JOB
           const removed = await rmDockerContainer(condidate.id)
           if (removed.message != null) {
             await this.emitAll(MsgTypes.message, removed.message)
