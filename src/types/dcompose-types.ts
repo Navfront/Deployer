@@ -1,3 +1,5 @@
+import { Version } from './utils-types'
+
 export interface DComposeEnvironment {
   [key: string]: string
 }
@@ -5,6 +7,7 @@ export interface DComposeEnvironment {
 export interface DComposeService {
   name: string
   image: string
+  version: Version | null
   portIn: number
   portOut: number
   restart: string

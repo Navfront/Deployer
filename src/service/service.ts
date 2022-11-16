@@ -2,13 +2,14 @@
 import { Mem } from '../mem.js'
 import { ex } from './executer.js'
 import { EmitAll } from '../deployer.js'
-import { dockerRun, getDockerVersion, parseContainers, rmDockerContainer, stopDockerContainer } from './utils.js'
+import { dockerRun, getDockerVersion, getNameFromImage, parseContainers, parseImages, rmDockerContainer, rmDockerImage, stopDockerContainer } from './utils.js'
 import { DCompose } from './dcompose.js'
-import { Container, GetContainers } from '../types/service-types.js'
+import { Container, GetContainers, GetImages, Image } from '../types/service-types.js'
 import { MsgTypes } from '../types/deployer-types.js'
 
 export class Service {
   private containers: Container[] = []
+  private images: Image[] = []
   private readonly mem: Mem
   private readonly dComposeService: DCompose
   emitAll: EmitAll
@@ -37,8 +38,21 @@ export class Service {
     }
   }
 
-  private async getImages (): Promise<any> {
-
+  private async getImages (): Promise<GetImages> {
+    const raw = await ex('docker image ls')
+    if (/error during connect/gi.test(raw)) {
+      return {
+        error: 'Error durning connect!',
+        raw: '',
+        images: []
+      }
+    }
+    this.images = parseImages(raw)
+    return {
+      error: null,
+      raw,
+      images: this.images
+    }
   }
 
   private async work (): Promise<void> {
@@ -55,6 +69,7 @@ export class Service {
       console.log('doing job', job, 'left: ', this.mem.length)
       // get current containers
       const current = await this.getContainers()
+
       if (current.error != null) {
         await this.emitAll(MsgTypes.message, current.error)
       }
@@ -78,6 +93,25 @@ export class Service {
           if (removed.message != null) {
             await this.emitAll(MsgTypes.message, removed.message)
           } else await this.emitAll(MsgTypes.message, removed.error)
+        }
+      }
+
+      // DELETING OLD IMAGES
+      const imagesData = await this.getImages()
+      if (imagesData.error != null) {
+        await this.emitAll(MsgTypes.message, imagesData.error)
+      } else {
+        const images = imagesData.images
+
+        for (const service of job.runs.services) {
+          const serviceName = getNameFromImage(service.image)
+          console.log(images, job?.runs.services)
+          const condidates = images.filter(image => image.name === serviceName && JSON.stringify(image.version) !== JSON.stringify(service.version))
+          console.log('DELETE IMAGES CONDIDATES:', condidates)
+          for (const delCondidate of condidates) {
+            const result = await rmDockerImage(delCondidate.id)
+            await this.emitAll(MsgTypes.message, result.message ?? result.error)
+          }
         }
       }
 

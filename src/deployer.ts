@@ -5,6 +5,7 @@ import { Service } from './service/service.js'
 import { Mem } from './mem.js'
 import { DeployerOptions, MsgTypes } from './types/deployer-types.js'
 import { Job } from './types/mem-types.js'
+import { parseVesrion } from './service/utils.js'
 
 export type EmitAll = (type: string, data: Promise<string> | string | undefined) => Promise<void>
 
@@ -32,6 +33,9 @@ export class Deployer {
     // Deploy hand logic
     void this.server.onPath('/dploy', 'post', async (req, res) => {
       const job = req.body as Job
+      job.runs.services.forEach(svc => {
+        svc.version = parseVesrion(svc.image)
+      })
       await this.emitAll(MsgTypes.message, `${String(new Date().toISOString())} Deploy: ${Object.keys(job.runs.services).join(' ')}`)
       // Push job to mem-queue
       await this.mem.pushJob(job)
