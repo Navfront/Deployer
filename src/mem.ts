@@ -1,10 +1,4 @@
-import { DComposeNode } from './service/dcompose'
-
-export interface Job {
-  'runs': DComposeNode
-}
-
-export type SubscribeCallBack = (() => Promise<void>) | null
+import { Job, SubscribeCallBack } from './types/mem-types'
 
 export class Mem {
   private readonly jobQueue: Job[] = []

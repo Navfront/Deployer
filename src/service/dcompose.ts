@@ -1,24 +1,6 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 import fs from 'fs'
-
-interface DComposeEnvironment {
-  [key: string]: string
-}
-
-interface DComposeService {
-  name: string
-  image: string
-  portIn: number
-  portOut: number
-  restart: string
-  environment?: DComposeEnvironment
-  depends_on?: string
-}
-
-export interface DComposeNode {
-  version: number
-  services: DComposeService[]
-}
+import { DComposeNode } from '../types/dcompose-types'
 
 export class DCompose {
   node: null | DComposeNode

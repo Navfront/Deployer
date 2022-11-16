@@ -1,24 +1,11 @@
 
 import { Mem } from '../mem.js'
 import { ex } from './executer.js'
-import { EmitAll, MsgTypes } from '../deployer.js'
-import { dockerRun, getDockerVersion, rmDockerContainer, stopDockerContainer } from './utils.js'
+import { EmitAll } from '../deployer.js'
+import { dockerRun, getDockerVersion, parseContainers, rmDockerContainer, stopDockerContainer } from './utils.js'
 import { DCompose } from './dcompose.js'
-
-interface Container {
-  id: string
-  image: string
-  isOnline: boolean
-  names: string
-  ports: string
-  created: string
-}
-
-interface GetContainers {
-  error: string | null
-  raw: string
-  containers: Container[]
-}
+import { Container, GetContainers } from '../types/service-types.js'
+import { MsgTypes } from '../types/deployer-types.js'
 
 export class Service {
   private containers: Container[] = []
@@ -33,21 +20,6 @@ export class Service {
     this.emitAll = emitAll
   }
 
-  private parseContainers (str: string): Container[] {
-    const result = str.split(/\n/).slice(1).filter(it => it !== '')
-    return result.map(rawContainer => {
-      const splitted = rawContainer.split(/\s{3,}/)
-      return {
-        id: splitted[0],
-        image: splitted[1],
-        isOnline: !/Exited/gi.test(splitted[4]),
-        ports: splitted[5],
-        names: '',
-        created: ''
-      }
-    })
-  }
-
   private async getContainers (): Promise<GetContainers> {
     const raw = await ex('docker ps -a')
     if (/error during connect/gi.test(raw)) {
@@ -57,12 +29,16 @@ export class Service {
         containers: []
       }
     }
-    this.containers = this.parseContainers(raw)
+    this.containers = parseContainers(raw)
     return {
       error: null,
       raw,
       containers: this.containers
     }
+  }
+
+  private async getImages (): Promise<any> {
+
   }
 
   private async work (): Promise<void> {

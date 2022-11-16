@@ -1,3 +1,4 @@
+import { Container } from '../types/service-types.js'
 import { ex, exNewTerm } from './executer.js'
 
 interface ExecutorReturn {
@@ -38,4 +39,19 @@ export async function rmDockerContainer (id: string): Promise<ExecutorReturn> {
 
 export async function dockerRun (command: string, messageCB: (data: any) => Promise<void>, errCB: (err: any) => Promise<void>): Promise<void> {
   exNewTerm(command, messageCB, errCB)
+}
+
+export function parseContainers (str: string): Container[] {
+  const result = str.split(/\n/).slice(1).filter(it => it !== '')
+  return result.map(rawContainer => {
+    const splitted = rawContainer.split(/\s{3,}/)
+    return {
+      id: splitted[0],
+      image: splitted[1],
+      isOnline: !/Exited/gi.test(splitted[4]),
+      ports: splitted[5],
+      names: '',
+      created: ''
+    }
+  })
 }

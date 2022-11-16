@@ -1,16 +1,10 @@
 
-import { Job, Mem } from './mem.js'
 import { SocketServer } from './server.js'
 import { Socket } from 'socket.io'
 import { Service } from './service/service.js'
-
-interface DeployerOptions {
-  port: number
-}
-
-export enum MsgTypes {
-  message = 'message'
-}
+import { Mem } from './mem.js'
+import { DeployerOptions, MsgTypes } from './types/deployer-types.js'
+import { Job } from './types/mem-types.js'
 
 export type EmitAll = (type: string, data: Promise<string> | string | undefined) => Promise<void>
 

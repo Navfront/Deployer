@@ -1,17 +1,9 @@
 import bodyParser from 'body-parser'
 import cors from 'cors'
-import express, { Application, Request, RequestHandler, Response } from 'express'
+import express, { Application, RequestHandler } from 'express'
 import http, { createServer } from 'http'
 import { Server } from 'socket.io'
-
-type OnCallback = (...args: any[]) => Promise<void>
-interface Options {
-  port: number
-}
-
-interface ExpressCallBack extends RequestHandler {
-  (req: Request, res: Response): Promise<void>
-}
+import { ExpressCallBack, OnCallback, Options } from './types/socket-server-types'
 
 export class SocketServer {
   private readonly expressApp: Application
