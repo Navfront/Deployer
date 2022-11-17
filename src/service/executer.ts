@@ -24,7 +24,7 @@ export const exNewTerm = (command: string, mesCb: any, errCb: any): void => {
     spawned.stderr.on('data', errCb)
     setTimeout(() => {
       spawned.kill(); console.log('Close spawn process', spawned.pid)
-    }, 30000)
+    }, 1800000)
   } catch (e) {
     console.log(e)
     errCb(e)
