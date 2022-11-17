@@ -47,11 +47,19 @@ export class Service {
         images: []
       }
     }
-    this.images = parseImages(raw)
+
+    if (/(?<=\n)\w+/gi.test(raw)) {
+      this.images = parseImages(raw)
+      return {
+        error: null,
+        raw,
+        images: this.images
+      }
+    }
     return {
-      error: null,
-      raw,
-      images: this.images
+      error: 'No images.',
+      raw: '',
+      images: []
     }
   }
 
@@ -76,23 +84,25 @@ export class Service {
 
       console.log('curr', current.containers)
       // DOCKER STOP CONTAINERS FROM JOB
-      for (const container of job.runs.services) {
-        const searchTemplate = container.name.replace(/:v\d\.\d\.\d/, '')
-        const condidate = this.containers.find(c => new RegExp(searchTemplate).test(c.image))
-        if (condidate != null) {
-          if (condidate.isOnline) {
-            const stopped = await stopDockerContainer(condidate.id)
-            if (stopped.message != null) (await this.emitAll(MsgTypes.message, stopped.message))
-            else {
-              await this.emitAll(MsgTypes.message, stopped.error)
+      if (this.containers.length !== 0) {
+        for (const container of job.runs.services) {
+          const searchTemplate = container.name.replace(/:v\d\.\d\.\d/, '')
+          const condidate = this.containers.find(c => new RegExp(searchTemplate).test(c.image))
+          if (condidate != null) {
+            if (condidate.isOnline) {
+              const stopped = await stopDockerContainer(condidate.id)
+              if (stopped.message != null) (await this.emitAll(MsgTypes.message, stopped.message))
+              else {
+                await this.emitAll(MsgTypes.message, stopped.error)
+              }
             }
-          }
 
-          // DOCKER DELETE CONTAINERS FROM JOB
-          const removed = await rmDockerContainer(condidate.id)
-          if (removed.message != null) {
-            await this.emitAll(MsgTypes.message, removed.message)
-          } else await this.emitAll(MsgTypes.message, removed.error)
+            // DOCKER DELETE CONTAINERS FROM JOB
+            const removed = await rmDockerContainer(condidate.id)
+            if (removed.message != null) {
+              await this.emitAll(MsgTypes.message, removed.message)
+            } else await this.emitAll(MsgTypes.message, removed.error)
+          }
         }
       }
 
